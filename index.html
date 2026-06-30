@@ -121,37 +121,41 @@
 <script>
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyFyFdRVKfBRVX7a09WZ8h0w8QZ7GE0jrQI7wu3FjjcKDC662OkJgX2nUvnUId72m-S2Q/exec";
 
-function addAttendance() {
+async function addAttendance() {
 
     const name = document.getElementById("name").value.trim();
     const status = document.getElementById("status").value;
     const msg = document.getElementById("msg");
     const btn = document.getElementById("submitBtn");
 
-    if (name === "") {
+    if (!name) {
         alert("Please enter your name.");
         return;
     }
 
-    btn.classList.add("loading");
+    btn.disabled = true;
     btn.innerText = "Submitting...";
+
     msg.classList.remove("show");
 
     const now = new Date();
 
-    const data = {
-        name: name,
-        status: status,
-        date: now.toLocaleDateString(),
-        time: now.toLocaleTimeString()
-    };
+    try {
 
-    fetch(WEB_APP_URL, {
-        method: "POST",
-        body: JSON.stringify(data)
-    })
-    .then(res => res.json())
-    .then((result) => {
+        const response = await fetch(WEB_APP_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                name: name,
+                status: status,
+                date: now.toLocaleDateString(),
+                time: now.toLocaleTimeString()
+            })
+        });
+
+        const result = await response.json();
 
         if(result.success){
 
@@ -164,23 +168,17 @@ function addAttendance() {
 
         }
 
-        msg.classList.add("show");
-
-    })
-    .catch((err) => {
+    } catch(err){
 
         console.error(err);
-
         msg.innerText = "❌ Error submitting attendance.";
-        msg.classList.add("show");
 
-    })
-    .finally(() => {
+    }
 
-        btn.classList.remove("loading");
-        btn.innerText = "Submit Attendance";
+    msg.classList.add("show");
 
-    });
+    btn.disabled = false;
+    btn.innerText = "Submit Attendance";
 
 }
 </script>
