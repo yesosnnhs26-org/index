@@ -117,32 +117,23 @@ async function addAttendance(){
     formData.append("date",now.toLocaleDateString());
     formData.append("time",now.toLocaleTimeString());
 
-    try{
+    try {
 
-        const response=await fetch(WEB_APP_URL,{
-            method:"POST",
-            body:formData
-        });
+    await fetch(WEB_APP_URL, {
+        method: "POST",
+        mode: "no-cors",
+        body: formData
+    });
 
-        const result=await response.json();
+    msg.innerHTML = "✅ Attendance Recorded!";
+    document.getElementById("name").value = "";
 
-        if(result.success){
+} catch (err) {
 
-            msg.innerHTML="✅ Attendance Recorded!";
-            document.getElementById("name").value="";
+    console.error(err);
+    msg.innerHTML = "❌ " + err.message;
 
-        }else{
-
-            msg.innerHTML="❌ "+result.message;
-
-        }
-
-    }catch(err){
-
-        console.error(err);
-        msg.innerHTML="❌ "+err.message;
-
-    }
+}
 
     btn.disabled=false;
     btn.innerText="Submit Attendance";
