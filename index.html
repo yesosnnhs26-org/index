@@ -119,18 +119,31 @@ async function addAttendance(){
 
     try {
 
-    console.log("Sending request...");
-
-    await fetch(WEB_APP_URL, {
+    const response = await fetch(WEB_APP_URL, {
         method: "POST",
-        mode: "no-cors",
-        body: formData
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            name: name,
+            status: status,
+            date: now.toLocaleDateString(),
+            time: now.toLocaleTimeString()
+        })
     });
 
-    console.log("Fetch finished.");
+    const result = await response.json();
 
-    msg.innerHTML = "✅ Attendance Recorded!";
-    document.getElementById("name").value = "";
+    if (result.success) {
+
+        msg.innerHTML = "✅ Attendance Recorded!";
+        document.getElementById("name").value = "";
+
+    } else {
+
+        msg.innerHTML = "❌ " + result.message;
+
+    }
 
 } catch (err) {
 
