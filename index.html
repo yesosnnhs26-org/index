@@ -6,7 +6,7 @@
 <title>Officer Attendance</title>
 
 <style>
-  body {
+body {
     margin: 0;
     font-family: "Inter", Arial, sans-serif;
     background: radial-gradient(circle at top, #0f3d2e, #06281f);
@@ -14,177 +14,142 @@
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-  }
+}
 
-  .container {
+.container {
     width: 95%;
     max-width: 420px;
-    background: rgba(18, 70, 52, 0.85);
+    background: rgba(18,70,52,.85);
     backdrop-filter: blur(14px);
     padding: 32px 26px;
     border-radius: 20px;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.45);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
+    box-shadow: 0 30px 60px rgba(0,0,0,.45);
+}
 
-  .container:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 35px 70px rgba(0,0,0,0.55);
-  }
+h1{
+    text-align:center;
+    color:#fff;
+    margin-bottom:25px;
+}
 
-  h1 {
-    text-align: center;
-    margin-bottom: 26px;
-    font-size: 22px;
-    color: #eafff4;
-    letter-spacing: 0.6px;
-  }
+input,select{
+    width:100%;
+    padding:15px;
+    margin-bottom:18px;
+    border:none;
+    border-radius:14px;
+    font-size:15px;
+    box-sizing:border-box;
+}
 
-  input, select {
-    width: 100%;
-    padding: 15px 16px;
-    margin-bottom: 18px;
-    border-radius: 14px;
-    border: none;
-    font-size: 15px;
-    background: rgba(240,255,250,0.95);
-    box-sizing: border-box;
-    transition: box-shadow 0.25s ease, transform 0.2s ease;
-  }
+button{
+    width:100%;
+    padding:16px;
+    border:none;
+    border-radius:16px;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+    background:linear-gradient(135deg,#34d399,#059669);
+    color:white;
+}
 
-  input:focus, select:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(72, 255, 168, 0.5);
-    transform: scale(1.01);
-  }
+button:disabled{
+    opacity:.6;
+}
 
-  button {
-    width: 100%;
-    padding: 16px;
-    border-radius: 16px;
-    border: none;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    background: linear-gradient(135deg, #34d399, #059669);
-    color: #ffffff;
-    transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.2s;
-  }
-
-  button:hover {
-    box-shadow: 0 10px 25px rgba(52, 211, 153, 0.45);
-  }
-
-  button:active {
-    transform: scale(0.97);
-  }
-
-  button.loading {
-    opacity: 0.7;
-    pointer-events: none;
-  }
-
-  #msg {
-    margin-top: 16px;
-    text-align: center;
-    font-size: 14px;
-    color: #d1fae5;
-    opacity: 0;
-    transform: translateY(6px);
-    transition: all 0.3s ease;
-  }
-
-  #msg.show {
-    opacity: 1;
-    transform: translateY(0);
-  }
+#msg{
+    margin-top:18px;
+    text-align:center;
+    color:white;
+}
 </style>
-</head>
 
+</head>
 <body>
 
 <div class="container">
-  <h1>Officer Attendance</h1>
 
-  <input type="text" id="name" placeholder="Enter your name">
+<h1>Officer Attendance</h1>
 
-  <select id="status">
+<input type="text" id="name" placeholder="Enter your name">
+
+<select id="status">
     <option value="Present">Present</option>
     <option value="Excused">Excused</option>
-  </select>
+</select>
 
-  <button id="submitBtn" onclick="addAttendance()">Submit Attendance</button>
+<button id="submitBtn" onclick="addAttendance()">
+Submit Attendance
+</button>
 
-  <div id="msg"></div>
+<div id="msg"></div>
+
 </div>
 
 <script>
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyFyFdRVKfBRVX7a09WZ8h0w8QZ7GE0jrQI7wu3FjjcKDC662OkJgX2nUvnUId72m-S2Q/exec";
 
-async function addAttendance() {
+const WEB_APP_URL =
+"https://script.google.com/macros/s/AKfycbyFyFdRVKfBRVX7a09WZ8h0w8QZ7GE0jrQI7wu3FjjcKDC662OkJgX2nUvnUId72m-S2Q/exec";
 
-    const name = document.getElementById("name").value.trim();
-    const status = document.getElementById("status").value;
-    const msg = document.getElementById("msg");
-    const btn = document.getElementById("submitBtn");
+async function addAttendance(){
 
-    if (!name) {
+    const name=document.getElementById("name").value.trim();
+    const status=document.getElementById("status").value;
+    const btn=document.getElementById("submitBtn");
+    const msg=document.getElementById("msg");
+
+    if(name===""){
         alert("Please enter your name.");
         return;
     }
 
-    btn.disabled = true;
-    btn.innerText = "Submitting...";
+    btn.disabled=true;
+    btn.innerText="Submitting...";
+    msg.innerHTML="";
 
-    msg.classList.remove("show");
+    const now=new Date();
 
-    const now = new Date();
+    const formData=new FormData();
 
-    try {
+    formData.append("name",name);
+    formData.append("status",status);
+    formData.append("date",now.toLocaleDateString());
+    formData.append("time",now.toLocaleTimeString());
 
-        const response = await fetch(WEB_APP_URL, {
-            method: "POST",
-            const formData = new FormData();
+    try{
 
-formData.append("name", name);
-formData.append("status", status);
-formData.append("date", now.toLocaleDateString());
-formData.append("time", now.toLocaleTimeString());
-
-const response = await fetch(WEB_APP_URL, {
-    method: "POST",
-    body: formData
-});
+        const response=await fetch(WEB_APP_URL,{
+            method:"POST",
+            body:formData
         });
 
-        const result = await response.json();
+        const result=await response.json();
 
         if(result.success){
 
-            msg.innerText = "✅ Attendance recorded successfully!";
-            document.getElementById("name").value = "";
+            msg.innerHTML="✅ Attendance Recorded!";
+            document.getElementById("name").value="";
 
         }else{
 
-            msg.innerText = "❌ " + result.message;
+            msg.innerHTML="❌ "+result.message;
 
         }
 
-    } catch(err){
+    }catch(err){
 
         console.error(err);
-        msg.innerText = "❌ Error submitting attendance.";
+        msg.innerHTML="❌ "+err.message;
 
     }
 
-    msg.classList.add("show");
-
-    btn.disabled = false;
-    btn.innerText = "Submit Attendance";
+    btn.disabled=false;
+    btn.innerText="Submit Attendance";
 
 }
-</script>
-  
-</body>
 
+</script>
+
+</body>
 </html>
