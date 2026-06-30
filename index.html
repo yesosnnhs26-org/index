@@ -144,15 +144,17 @@ async function addAttendance() {
 
         const response = await fetch(WEB_APP_URL, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                name: name,
-                status: status,
-                date: now.toLocaleDateString(),
-                time: now.toLocaleTimeString()
-            })
+            const formData = new FormData();
+
+formData.append("name", name);
+formData.append("status", status);
+formData.append("date", now.toLocaleDateString());
+formData.append("time", now.toLocaleTimeString());
+
+const response = await fetch(WEB_APP_URL, {
+    method: "POST",
+    body: formData
+});
         });
 
         const result = await response.json();
