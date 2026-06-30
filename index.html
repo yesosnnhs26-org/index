@@ -119,11 +119,15 @@ async function addAttendance(){
 
     try {
 
+    console.log("Sending request...");
+
     await fetch(WEB_APP_URL, {
         method: "POST",
         mode: "no-cors",
         body: formData
     });
+
+    console.log("Fetch finished.");
 
     msg.innerHTML = "✅ Attendance Recorded!";
     document.getElementById("name").value = "";
