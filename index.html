@@ -6,162 +6,166 @@
 <title>Officer Attendance</title>
 
 <style>
-body{
-    margin:0;
-    font-family:Inter,Arial,sans-serif;
-    background:radial-gradient(circle at top,#0f3d2e,#06281f);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    min-height:100vh;
-}
+  body {
+    margin: 0;
+    font-family: "Inter", Arial, sans-serif;
+    background: radial-gradient(circle at top, #0f3d2e, #06281f);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
 
-.container{
-    width:95%;
-    max-width:420px;
-    background:rgba(18,70,52,.85);
-    backdrop-filter:blur(14px);
-    padding:32px 26px;
-    border-radius:20px;
-    box-shadow:0 30px 60px rgba(0,0,0,.45);
-}
+  .container {
+    width: 95%;
+    max-width: 420px;
+    background: rgba(18, 70, 52, 0.85);
+    backdrop-filter: blur(14px);
+    padding: 32px 26px;
+    border-radius: 20px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.45);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
 
-h1{
-    color:white;
-    text-align:center;
-    margin-bottom:25px;
-}
+  .container:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 35px 70px rgba(0,0,0,0.55);
+  }
 
-input,select{
-    width:100%;
-    padding:15px;
-    margin-bottom:18px;
-    border:none;
-    border-radius:14px;
-    box-sizing:border-box;
-    font-size:15px;
-}
+  h1 {
+    text-align: center;
+    margin-bottom: 26px;
+    font-size: 22px;
+    color: #eafff4;
+    letter-spacing: 0.6px;
+  }
 
-button{
-    width:100%;
-    padding:16px;
-    border:none;
-    border-radius:16px;
-    background:linear-gradient(135deg,#34d399,#059669);
-    color:white;
-    font-size:16px;
-    font-weight:bold;
-    cursor:pointer;
-}
+  input, select {
+    width: 100%;
+    padding: 15px 16px;
+    margin-bottom: 18px;
+    border-radius: 14px;
+    border: none;
+    font-size: 15px;
+    background: rgba(240,255,250,0.95);
+    box-sizing: border-box;
+    transition: box-shadow 0.25s ease, transform 0.2s ease;
+  }
 
-button:disabled{
-    opacity:.6;
-}
+  input:focus, select:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(72, 255, 168, 0.5);
+    transform: scale(1.01);
+  }
 
-#msg{
-    margin-top:18px;
-    text-align:center;
-    color:white;
-}
+  button {
+    width: 100%;
+    padding: 16px;
+    border-radius: 16px;
+    border: none;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    background: linear-gradient(135deg, #34d399, #059669);
+    color: #ffffff;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.2s;
+  }
+
+  button:hover {
+    box-shadow: 0 10px 25px rgba(52, 211, 153, 0.45);
+  }
+
+  button:active {
+    transform: scale(0.97);
+  }
+
+  button.loading {
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  #msg {
+    margin-top: 16px;
+    text-align: center;
+    font-size: 14px;
+    color: #d1fae5;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: all 0.3s ease;
+  }
+
+  #msg.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
 </style>
 </head>
 
 <body>
 
 <div class="container">
+  <h1>Officer Attendance</h1>
 
-<h1>Officer Attendance</h1>
+  <input type="text" id="name" placeholder="Enter your name">
 
-<input
-type="text"
-id="name"
-placeholder="Enter your name"
-autocomplete="off">
+  <select id="status">
+    <option value="Present">Present</option>
+    <option value="Excused">Excused</option>
+  </select>
 
-<select id="status">
-<option value="Present">Present</option>
-<option value="Excused">Excused</option>
-</select>
+  <button id="submitBtn" onclick="addAttendance()">Submit Attendance</button>
 
-<button id="submitBtn">
-Submit Attendance
-</button>
-
-<div id="msg"></div>
-
+  <div id="msg"></div>
 </div>
 
 <script>
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxNdsO4fD_AfwQGiWq9KNm6qs58WZO-lC5-__jErEH-2HVR8FYowyr0DHJyhulJnuSx5g/exec";
 
-const WEB_APP_URL = "https://manattendance.yesosnnhs26.workers.dev/";
+  function addAttendance() {
+    const name = document.getElementById("name").value.trim();
+    const status = document.getElementById("status").value;
+    const msg = document.getElementById("msg");
+    const btn = document.getElementById("submitBtn");
 
-document
-.getElementById("submitBtn")
-.addEventListener("click", addAttendance);
-
-async function addAttendance(){
-
-    const name=document.getElementById("name").value.trim();
-    const status=document.getElementById("status").value;
-    const btn=document.getElementById("submitBtn");
-    const msg=document.getElementById("msg");
-
-    if(!name){
-        alert("Please enter your name.");
-        return;
+    if (name === "") {
+      alert("Please enter your name.");
+      return;
     }
 
-    btn.disabled=true;
-    btn.textContent="Submitting...";
-    msg.textContent="";
+    btn.classList.add("loading");
+    btn.innerText = "Submitting...";
+    msg.classList.remove("show");
 
-    const payload={
-        name:name,
-        status:status,
-        date:new Date().toLocaleDateString(),
-        time:new Date().toLocaleTimeString()
+    const now = new Date();
+
+    const data = {
+      name: name,
+      status: status,
+      date: now.toLocaleDateString(),
+      time: now.toLocaleTimeString()
     };
 
-    console.log("Sending JSON:",payload);
-
-    try{
-
-        const response=await fetch(WEB_APP_URL,{
-            method:"POST",
-            headers:{
-                "Content-Type":"application/json"
-            },
-            body:JSON.stringify(payload)
-        });
-
-        const result=await response.json();
-
-        console.log(result);
-
-        if(result.success){
-
-            msg.innerHTML="✅ Attendance Recorded!";
-            document.getElementById("name").value="";
-
-        }else{
-
-            msg.innerHTML="❌ "+result.message;
-
-        }
-
-    }catch(err){
-
-        console.error(err);
-        msg.innerHTML="❌ "+err.message;
-
-    }
-
-    btn.disabled=false;
-    btn.textContent="Submit Attendance";
-
-}
-
+    fetch(WEB_APP_URL, {
+      method: "POST",
+      body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(() => {
+      msg.innerText = "✅ Attendance recorded successfully!";
+      msg.classList.add("show");
+      document.getElementById("name").value = "";
+    })
+    .catch(() => {
+      msg.innerText = "❌ Error submitting attendance.";
+      msg.classList.add("show");
+    })
+    .finally(() => {
+      btn.classList.remove("loading");
+      btn.innerText = "Submit Attendance";
+    });
+  }
 </script>
 
 </body>
+
 </html>
