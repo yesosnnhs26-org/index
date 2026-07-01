@@ -6,29 +6,29 @@
 <title>Officer Attendance</title>
 
 <style>
-body {
-    margin: 0;
-    font-family: "Inter", Arial, sans-serif;
-    background: radial-gradient(circle at top, #0f3d2e, #06281f);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
+body{
+    margin:0;
+    font-family:Inter,Arial,sans-serif;
+    background:radial-gradient(circle at top,#0f3d2e,#06281f);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
 }
 
-.container {
-    width: 95%;
-    max-width: 420px;
-    background: rgba(18,70,52,.85);
-    backdrop-filter: blur(14px);
-    padding: 32px 26px;
-    border-radius: 20px;
-    box-shadow: 0 30px 60px rgba(0,0,0,.45);
+.container{
+    width:95%;
+    max-width:420px;
+    background:rgba(18,70,52,.85);
+    backdrop-filter:blur(14px);
+    padding:32px 26px;
+    border-radius:20px;
+    box-shadow:0 30px 60px rgba(0,0,0,.45);
 }
 
 h1{
+    color:white;
     text-align:center;
-    color:#fff;
     margin-bottom:25px;
 }
 
@@ -38,8 +38,8 @@ input,select{
     margin-bottom:18px;
     border:none;
     border-radius:14px;
-    font-size:15px;
     box-sizing:border-box;
+    font-size:15px;
 }
 
 button{
@@ -47,11 +47,11 @@ button{
     padding:16px;
     border:none;
     border-radius:16px;
+    background:linear-gradient(135deg,#34d399,#059669);
+    color:white;
     font-size:16px;
     font-weight:bold;
     cursor:pointer;
-    background:linear-gradient(135deg,#34d399,#059669);
-    color:white;
 }
 
 button:disabled{
@@ -64,22 +64,26 @@ button:disabled{
     color:white;
 }
 </style>
-
 </head>
+
 <body>
 
 <div class="container">
 
 <h1>Officer Attendance</h1>
 
-<input type="text" id="name" placeholder="Enter your name">
+<input
+type="text"
+id="name"
+placeholder="Enter your name"
+autocomplete="off">
 
 <select id="status">
-    <option value="Present">Present</option>
-    <option value="Excused">Excused</option>
+<option value="Present">Present</option>
+<option value="Excused">Excused</option>
 </select>
 
-<button id="submitBtn" onclick="addAttendance()">
+<button id="submitBtn">
 Submit Attendance
 </button>
 
@@ -89,8 +93,11 @@ Submit Attendance
 
 <script>
 
-const WEB_APP_URL =
-"https://manattendance.yesosnnhs26.workers.dev/";
+const WEB_APP_URL = "https://manattendance.yesosnnhs26.workers.dev/";
+
+document
+.getElementById("submitBtn")
+.addEventListener("click", addAttendance);
 
 async function addAttendance(){
 
@@ -99,61 +106,58 @@ async function addAttendance(){
     const btn=document.getElementById("submitBtn");
     const msg=document.getElementById("msg");
 
-    if(name===""){
+    if(!name){
         alert("Please enter your name.");
         return;
     }
 
     btn.disabled=true;
-    btn.innerText="Submitting...";
-    msg.innerHTML="";
+    btn.textContent="Submitting...";
+    msg.textContent="";
 
-    const now=new Date();
+    const payload={
+        name:name,
+        status:status,
+        date:new Date().toLocaleDateString(),
+        time:new Date().toLocaleTimeString()
+    };
 
-    const formData=new FormData();
+    console.log("Sending JSON:",payload);
 
-    formData.append("name",name);
-    formData.append("status",status);
-    formData.append("date",now.toLocaleDateString());
-    formData.append("time",now.toLocaleTimeString());
+    try{
 
-    try {
+        const response=await fetch(WEB_APP_URL,{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify(payload)
+        });
 
-    const response = await fetch(WEB_APP_URL, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            name: name,
-            status: status,
-            date: now.toLocaleDateString(),
-            time: now.toLocaleTimeString()
-        })
-    });
+        const result=await response.json();
 
-    const result = await response.json();
+        console.log(result);
 
-    if (result.success) {
+        if(result.success){
 
-        msg.innerHTML = "✅ Attendance Recorded!";
-        document.getElementById("name").value = "";
+            msg.innerHTML="✅ Attendance Recorded!";
+            document.getElementById("name").value="";
 
-    } else {
+        }else{
 
-        msg.innerHTML = "❌ " + result.message;
+            msg.innerHTML="❌ "+result.message;
+
+        }
+
+    }catch(err){
+
+        console.error(err);
+        msg.innerHTML="❌ "+err.message;
 
     }
 
-} catch (err) {
-
-    console.error(err);
-    msg.innerHTML = "❌ " + err.message;
-
-}
-
     btn.disabled=false;
-    btn.innerText="Submit Attendance";
+    btn.textContent="Submit Attendance";
 
 }
 
